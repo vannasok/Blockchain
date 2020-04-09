@@ -142,29 +142,29 @@ def mine():
             response = {
                 # Send a JSON response with the new block
                 'Error': 'Invalid proof format.'}
-            code = 400
+            return jsonify(response), 400
 
-    else:
-        # check if the proof is valid
-        block_string = json.dumps(blockchain.last_block, sort_keys=True)
-        miner_proof = data['proof']
-
-        if blockchain.valid_proof(block_string, miner_proof):
-            previous_hash = blockchain.hash(blockchain.last_block)
-            new_block = blockchain.new_block(miner_proof, previous_hash)
-
-            response = {
-                'message': "New Block Forged",
-                'block': new_block
-            }
-            code = 200
         else:
-            response = {
-                'message': 'please update last block'
-            }
-            code = 400
+            # check if the proof is valid
+            block_string = json.dumps(blockchain.last_block, sort_keys=True)
+            miner_proof = data['proof']
 
-    return jsonify(response), code
+            if blockchain.valid_proof(block_string, miner_proof):
+                previous_hash = blockchain.hash(blockchain.last_block)
+                new_block = blockchain.new_block(miner_proof, previous_hash)
+
+                response = {
+                    'message': "New Block Forged",
+                    'block': new_block
+                }
+                return jsonify(response), 200
+            else:
+                response = {
+                    'message': 'please update last block'
+                }
+                return jsonify(response), 400
+
+        return jsonify(response), 200
 
 
 @app.route('/chain', methods=['GET'])
